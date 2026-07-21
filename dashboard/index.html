@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hospital Readmissions Dashboard | CMS HRRP 5-State Sample</title>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<style>
+  :root { color-scheme: light; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f5f7fa;
+    color: #1a2027;
+    margin: 0;
+    padding: 24px 32px 48px;
+  }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .subtitle { color: #5b6675; font-size: 14px; margin-bottom: 24px; }
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+  .kpi-card {
+    background: white; border-radius: 10px; padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); flex: 1; min-width: 180px;
+  }
+  .kpi-value { font-size: 26px; font-weight: 700; color: #1f4e8c; }
+  .kpi-label { font-size: 13px; color: #5b6675; margin-top: 4px; }
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .chart-card {
+    background: white; border-radius: 10px; padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .full-width { grid-column: 1 / -1; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eef0f3; }
+  th { color: #5b6675; font-weight: 600; }
+  .footer-note { margin-top: 28px; font-size: 12px; color: #8a93a3; line-height: 1.6; }
+  @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+  <h1>Hospital Readmissions Dashboard</h1>
+  <div class="subtitle">
+    CMS Hospital Readmissions Reduction Program (HRRP) &mdash; FY2024 5-state sample
+    (CA, TX, NY, FL, OH) &middot; Self-directed portfolio project, not employer work
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-value">2,291</div>
+      <div class="kpi-label">Facility-measure records analyzed</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">53.4%</div>
+      <div class="kpi-label">Scored records with excess readmissions (ratio &gt; 1.0)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">AMI</div>
+      <div class="kpi-label">Highest-penalty condition (58.8% of hospitals penalized)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">5</div>
+      <div class="kpi-label">States compared (CA, TX, NY, FL, OH)</div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card"><div id="chart-measure" style="height:360px;"></div></div>
+    <div class="chart-card"><div id="chart-state" style="height:360px;"></div></div>
+    <div class="chart-card full-width"><div id="chart-gap" style="height:340px;"></div></div>
+    <div class="chart-card full-width">
+      <h3 style="margin:6px 0 12px 8px; font-size:15px;">Top 10 worst-performing facility-measures (highest excess readmission ratio)</h3>
+      <table id="worst-table">
+        <thead><tr><th>Facility</th><th>State</th><th>Condition</th><th>Excess Ratio</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Data source: CMS Provider Data Catalog, Hospital Readmissions Reduction Program
+    (dataset 9n3s-kdb3), FY2024 measures (07/01/2021&ndash;06/30/2024 performance period),
+    pulled live via the CMS datastore API. This is a self-directed portfolio project
+    built on public CMS data for job-search purposes &mdash; it does not represent any
+    employer's work or proprietary analysis. Full methodology in the repo README.
+  </div>
+
+<script>
+const byMeasure = [
+  {"measure_name": "READM-30-HF", "avg": 1.0158, "n": 366, "pct_pen": 57.377},
+  {"measure_name": "READM-30-AMI", "avg": 1.0158, "n": 262, "pct_pen": 58.7786},
+  {"measure_name": "READM-30-PN", "avg": 1.0137, "n": 369, "pct_pen": 50.9485},
+  {"measure_name": "READM-30-COPD", "avg": 1.007, "n": 335, "pct_pen": 53.7313},
+  {"measure_name": "READM-30-HIP-KNEE", "avg": 1.0032, "n": 188, "pct_pen": 47.3404},
+  {"measure_name": "READM-30-CABG", "avg": 0.9998, "n": 150, "pct_pen": 46.6667}
+];
+
+const byState = [
+  {"state": "FL", "avg": 1.0145, "n": 379, "pct_pen": 53.2982},
+  {"state": "CA", "avg": 1.0126, "n": 315, "pct_pen": 56.1905},
+  {"state": "NY", "avg": 1.0122, "n": 317, "pct_pen": 56.4669},
+  {"state": "OH", "avg": 1.0093, "n": 352, "pct_pen": 51.4205},
+  {"state": "TX", "avg": 1.0043, "n": 307, "pct_pen": 49.5114}
+];
+
+const gapData = [
+  {"measure_name": "READM-30-HF", "avg_gap": 0.314},
+  {"measure_name": "READM-30-PN", "avg_gap": 0.230},
+  {"measure_name": "READM-30-AMI", "avg_gap": 0.220},
+  {"measure_name": "READM-30-COPD", "avg_gap": 0.130},
+  {"measure_name": "READM-30-HIP-KNEE", "avg_gap": 0.031},
+  {"measure_name": "READM-30-CABG", "avg_gap": 0.010}
+];
+
+const worst10 = [
+  ["FAIRFIELD MEDICAL CENTER","OH","READM-30-HIP-KNEE",1.6297],
+  ["GUADALUPE REGIONAL MEDICAL CENTER","TX","READM-30-HIP-KNEE",1.4782],
+  ["HCA FLORIDA PASADENA HOSPITAL A PART OF HCA FLORID","FL","READM-30-HIP-KNEE",1.4314],
+  ["OROVILLE HOSPITAL","CA","READM-30-PN",1.4255],
+  ["OROVILLE HOSPITAL","CA","READM-30-HF",1.3606],
+  ["ORLANDO HEALTH SOUTH LAKE HOSPITAL","FL","READM-30-HIP-KNEE",1.3525],
+  ["THE JEWISH HOSPITAL-MERCY HEALTH","OH","READM-30-HIP-KNEE",1.3086],
+  ["MAIMONIDES MEDICAL CENTER","NY","READM-30-PN",1.3011],
+  ["MERCY GENERAL HOSPITAL","CA","READM-30-HIP-KNEE",1.2837],
+  ["MOUNT SINAI WEST","NY","READM-30-HIP-KNEE",1.2596]
+];
+
+Plotly.newPlot('chart-measure', [{
+  x: byMeasure.map(d => d.measure_name),
+  y: byMeasure.map(d => d.avg),
+  type: 'bar',
+  marker: { color: '#1f4e8c' },
+  text: byMeasure.map(d => d.pct_pen.toFixed(1) + '% penalized'),
+  textposition: 'outside'
+}], {
+  title: 'Avg. excess readmission ratio by condition',
+  yaxis: { title: 'Avg excess ratio (1.0 = expected)', range: [0.95, 1.08] },
+  margin: { t: 40, b: 60 }
+}, {responsive: true, displayModeBar: false});
+
+Plotly.newPlot('chart-state', [{
+  x: byState.map(d => d.state),
+  y: byState.map(d => d.avg),
+  type: 'bar',
+  marker: { color: '#2e7d5b' },
+  text: byState.map(d => d.pct_pen.toFixed(1) + '% penalized'),
+  textposition: 'outside'
+}], {
+  title: 'Avg. excess readmission ratio by state',
+  yaxis: { title: 'Avg excess ratio (1.0 = expected)', range: [0.99, 1.03] },
+  margin: { t: 40, b: 60 }
+}, {responsive: true, displayModeBar: false});
+
+Plotly.newPlot('chart-gap', [{
+  x: gapData.map(d => d.measure_name),
+  y: gapData.map(d => d.avg_gap),
+  type: 'bar',
+  marker: { color: '#a83240' }
+}], {
+  title: 'Readmission rate gap (predicted vs. expected rate) by condition — the avoidable-readmission signal',
+  yaxis: { title: 'Predicted rate − Expected rate (percentage points)' },
+  margin: { t: 40, b: 60 }
+}, {responsive: true, displayModeBar: false});
+
+const tbody = document.querySelector('#worst-table tbody');
+worst10.forEach(row => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3].toFixed(4)}</td>`;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
