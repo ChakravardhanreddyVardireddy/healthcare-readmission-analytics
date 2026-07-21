@@ -1,0 +1,29 @@
+{
+  "by_measure": [
+    {"measure_name": "READM-30-AMI", "avg": 1.0158, "n": 262, "pct_pen": 58.7786},
+    {"measure_name": "READM-30-CABG", "avg": 0.9998, "n": 150, "pct_pen": 46.6667},
+    {"measure_name": "READM-30-COPD", "avg": 1.007, "n": 335, "pct_pen": 53.7313},
+    {"measure_name": "READM-30-HF", "avg": 1.0158, "n": 366, "pct_pen": 57.377},
+    {"measure_name": "READM-30-HIP-KNEE", "avg": 1.0032, "n": 188, "pct_pen": 47.3404},
+    {"measure_name": "READM-30-PN", "avg": 1.0137, "n": 369, "pct_pen": 50.9485}
+  ],
+  "by_state": [
+    {"state": "CA", "avg": 1.0126, "n": 315, "pct_pen": 56.1905},
+    {"state": "FL", "avg": 1.0145, "n": 379, "pct_pen": 53.2982},
+    {"state": "NY", "avg": 1.0122, "n": 317, "pct_pen": 56.4669},
+    {"state": "OH", "avg": 1.0093, "n": 352, "pct_pen": 51.4205},
+    {"state": "TX", "avg": 1.0043, "n": 307, "pct_pen": 49.5114}
+  ],
+  "worst10": [
+    {"facility_name": "FAIRFIELD MEDICAL CENTER", "state": "OH", "measure_name": "READM-30-HIP-KNEE", "excess_readmission_ratio": 1.6297},
+    {"facility_name": "GUADALUPE REGIONAL MEDICAL CENTER", "state": "TX", "measure_name": "READM-30-HIP-KNEE", "excess_readmission_ratio": 1.4782},
+    {"facility_name": "HCA FLORIDA PASADENA HOSPITAL A PART OF HCA FLORID", "state": "FL", "measure_name": "READM-30-HIP-KNEE", "excess_readmission_ratio": 1.4314},
+    {"facility_name": "OROVILLE HOSPITAL", "state": "CA", "measure_name": "READM-30-PN", "excess_readmission_ratio": 1.4255},
+    {"facility_name": "OROVILLE HOSPITAL", "state": "CA", "measure_name": "READM-30-HF", "excess_readmission_ratio": 1.3606},
+    {"facility_name": "ORLANDO HEALTH SOUTH LAKE HOSPITAL", "state": "FL", "measure_name": "READM-30-HIP-KNEE", "excess_readmission_ratio": 1.3525},
+    {"facility_name": "THE JEWISH HOSPITAL-MERCY HEALTH", "state": "OH", "measure_name": "READM-30-HIP-KNEE", "excess_readmission_ratio": 1.3086},
+    {"facility_name": "MAIMONIDES MEDICAL CENTER", "state": "NY", "measure_name": "READM-30-PN", "excess_readmission_ratio": 1.3011},
+    {"facility_name": "MERCY GENERAL HOSPITAL", "state": "CA", "measure_name": "READM-30-HIP-KNEE", "excess_readmission_ratio": 1.2837},
+    {"facility_name": "MOUNT SINAI WEST", "state": "NY", "measure_name": "READM-30-HIP-KNEE", "excess_readmission_ratio": 1.2596}
+  ]
+}
