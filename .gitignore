@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+.env
+
+# Generated locally by scripts/01_clean_data.py - not committed to keep the
+# repo lean. data/hrrp_sample.csv (a static 300-row sample) IS committed.
+data/CA.csv
+data/TX.csv
+data/NY.csv
+data/FL.csv
+data/OH.csv
+data/hrrp_clean.csv
+data/hrrp.db
